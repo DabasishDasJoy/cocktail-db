@@ -2,30 +2,35 @@ const loadData = async() => {
     const response = await fetch("https://www.thecocktaildb.com/api/json/v1/1/search.php?f=a");
     const data = await response.json();
     displayData(data.drinks);
-    
-    categoryFilterLists();
-    glassesFilterLists();
-    ingredientsFilterLists();
-    alchoholicFilterLists();
+
+    categoryFilterLists('filter-by-cat', 'c');
+    categoryFilterLists('filter-by-glass', 'g');
+    categoryFilterLists('filter-by-ingredients', 'i');
+    categoryFilterLists('filter-by-alchoholic', 'a');
 }
 
-const categoryFilterLists = async () => {
-    const response = await fetch("https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list");
+const categoryFilterLists = async (target, filterBy) => {
+    const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/list.php?${filterBy}=list`);
     const data = await response.json();
-    displayCategoryFilterLists(data.drinks);
+    displayCategoryFilterLists(data.drinks, target);
 }
-const displayCategoryFilterLists = (catagories) => {
-    const filterByCatField = document.getElementById('filter-by-cat');
+const displayCategoryFilterLists = (lists, target) => {
+    const filterByCatField = document.getElementById(target);
 
-    catagories.forEach(catagory => {
-        // <li><a class="dropdown-item" href="#">Menu item</a></li>    
+    lists.forEach(list => {
+        const values = Object.values(list);
+        const [listName] = values;
         const li = document.createElement('li');
+        
         li.innerHTML = `
-            <a class="dropdown-item" href="#">${catagory.strCategory}</a>
+            <a class="dropdown-item" href="#">${listName}</a>
         `;
         filterByCatField.appendChild(li);
     });
 }
+
+
+
 const displayData = (drinks) => {
     const drinksContainer = document.getElementById('display-drinks-container');
     console.log(drinks);
@@ -38,7 +43,7 @@ const displayData = (drinks) => {
                 <img src="${drink.strDrinkThumb}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">${drink.strDrink}</h5>
-                    <p class="card-text">${drink.strInstructions}</p>
+                    <p class="card-text">${drink.strInstructions.length > 60 ?  drink.strInstructions.slice(0, 60): drink.strInstructions}</p>
                 </div>
             </div>
         `;
